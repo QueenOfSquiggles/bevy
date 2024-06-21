@@ -1208,7 +1208,7 @@ impl EntityCommands<'_> {
     }
 
     /// Creates an [`Observer`](crate::observer::Observer) listening for a trigger of type `T` that targets this entity.
-    pub fn observe<E: Event, B: Bundle, M>(
+    pub fn observe_global<E: Event, B: Bundle, M>(
         &mut self,
         system: impl IntoObserverSystem<E, B, M>,
     ) -> &mut Self {
