@@ -945,6 +945,54 @@ impl EntityCommands<'_> {
         self.add(insert(bundle))
     }
 
+    /// Inserts a new [Observer] that is set to observe the associated entity.
+    /// # Panics
+    ///
+    /// The command will panic when applied if the associated entity does not exist.
+    ///
+    /// To avoid a panic in this case, use the command [`Self::try_observe_self`] instead.
+    ///
+    /// # Example
+    /// ```
+    /// fn spawn_with_observer(mut commands: Commands) {
+    ///     commands
+    ///         .spawn(Player, Life(5), Defense(2))
+    ///         .observe_self(respond_to_life_lost)
+    ///         .observe_self(respond_to_damage_taken);
+    ///
+    /// }
+    /// ```
+    pub fn observe_self<E, B, M>(&mut self, system: impl IntoObserverSystem<E, B, M>) -> &mut Self
+    where
+        E: Event,
+        B: Bundle,
+    {
+        self.insert(Observer::new(system).with_entity(self.entity))
+    }
+
+    /// Tries to insert a new [Observer] that is set to observe the associated entity.
+    ///
+    /// # Example
+    /// ```
+    /// fn spawn_with_observer(mut commands: Commands) {
+    ///     commands
+    ///         .spawn(Player, Life(5), Defense(2))
+    ///         .try_observe_self(respond_to_life_lost)
+    ///         .try_observe_self(respond_to_damage_taken);
+    ///
+    /// }
+    /// ```
+    pub fn try_observe_self<E, B, M>(
+        &mut self,
+        system: impl IntoObserverSystem<E, B, M>,
+    ) -> &mut Self
+    where
+        E: Event,
+        B: Bundle,
+    {
+        self.try_insert(Observer::new(system).with_entity(self.entity))
+    }
+
     /// Tries to add a [`Bundle`] of components to the entity.
     ///
     /// This will overwrite any previous value(s) of the same component type.
